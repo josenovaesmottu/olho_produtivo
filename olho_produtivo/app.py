@@ -2,6 +2,7 @@ import requests
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import time
 
 # ==============================
@@ -9,7 +10,6 @@ import time
 # ==============================
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
 st.title("⚙️ Acompanhamento de Produtividade — Mottu")
-
 
 filiais = {
     "Mottu Abaetetuba": 282, "Mottu Alagoinhas": 110, "Mottu Ananindeua": 122, "Mottu Anápolis": 58,
@@ -58,11 +58,9 @@ regionais = {
     "Bruno": [31, 68, 25, 63, 81, 79, 38, 62, 66, 8, 3, 19, 72, 15, 118, 40, 39],
     "Flávio": [82, 24, 83, 33, 94, 7, 13, 37, 36, 41, 477, 86, 44, 1, 34, 35, 23],
     "Francisco": [59, 5, 61, 30, 4, 29, 28, 27, 26, 6, 9, 114, 21, 16, 84, 18, 122, 17],
-    "Júlio": [59, 5, 61, 30, 4, 29, 28, 27, 26, 6, 9, 114, 21, 16, 84, 18, 122, 17],
-    "Leonardo": [77, 455, 474, 416, 285, 357, 463, 397, 259, 174, 300, 55, 203, 417, 356, 372, 473, 319, 507, 462, 489, 505, 476, 396, 478, 469, 497, 366, 458, 267, 475, 449, 454, 472],
-    "Lucas": [249, 107, 42, 113, 47, 48, 106, 43, 71, 413, 11, 87, 85, 459, 499],
-    "Rogério": [271, 274, 258, 110, 329, 69, 51, 73, 70, 76, 252, 284, 95, 115, 238, 74, 80, 109, 49, 50, 310, 295, 405, 384, 283, 225, 266, 248, 402, 250, 404, 365, 282, 64, 175, 311],
-    "Jessica": [376, 486, 491, 257, 290, 260, 456, 307, 470, 301, 297, 240, 303, 294, 399, 223, 224, 299, 480, 345, 306, 242, 241, 237, 247, 218, 304, 254, 268, 269, 289, 291, 287, 288, 296, 305, 230, 226, 228, 236, 227, 229, 231, 286, 264, 496, 501, 494, 253, 261, 251, 217, 465, 500, 488, 373, 355, 451, 446, 460, 457, 448, 452, 453, 221, 216, 222, 220, 272, 232, 233, 234, 235, 362, 364, 374, 358, 359, 450, 361, 468, 471, 466, 490, 263, 262, 354, 351, 371, 367, 369, 353, 370, 326, 211, 325, 323, 210, 331, 338, 368, 506, 314, 316, 333, 377, 342, 317, 315, 332, 447, 388, 512, 352, 360, 339, 341, 348, 308, 503, 350, 508, 380, 385, 383, 390, 378, 386, 391, 387, 401, 382, 393, 395, 392, 467, 381, 400, 394, 492, 403, 389, 379, 398, 375, 344, 322, 320, 327, 337, 340, 347, 330, 343, 324, 346, 349, 328, 336, 493, 483, 498, 510, 481, 487, 495, 485, 504, 318, 482, 502, 479, 124, 239, 424, 181, 119, 335, 212, 423, 186, 104, 422, 99, 215, 409, 120, 415, 121, 171, 419, 208, 213, 204, 187, 408, 273, 182, 214, 161, 184, 160, 219, 188, 406, 172, 96, 464, 177, 206, 100, 293, 461, 112, 279, 445, 407, 302, 275, 169, 205, 425, 209, 178, 334, 321, 411, 484, 179, 270, 276, 278, 412, 418, 292, 98, 176, 410, 117, 185, 298, 414, 207, 170, 280, 281, 97, 277],
+    "Leonardo": [77, 455, 474, 416, 285, 357, 463, 397, 259, 174, 300, 55, 203, 417, 356, 372, 473, 319],
+    "Lucas": [249, 107, 42, 113, 47, 48, 106, 43, 71, 413, 11, 85, 459],
+    "Rogério": [271, 274, 258, 110, 329, 69, 51, 73, 70, 76, 252, 284, 95, 115, 238, 74, 80, 109],
 }
 
 id_para_nome = {v: k for k, v in filiais.items()}
@@ -70,7 +68,6 @@ id_para_nome = {v: k for k, v in filiais.items()}
 # ==============================
 # TOKEN
 # ==============================
-
 def retorna_token():
     username = st.secrets["MOTTU_USERNAME"]
     password = st.secrets["MOTTU_PASSWORD"]
@@ -91,22 +88,26 @@ def retorna_token():
     st.error(f"Erro ao gerar token ({r.status_code}): {r.text}")
     return None
 
-def get_manutencoes(lugar_id, token): 
 
-    
+# ==============================
+# GET MANUTENÇÕES
+# ==============================
+def get_manutencoes(lugar_id, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2/Manutencao/Realizadas/Lugar/{lugar_id}"
     headers = {"Authorization": f"Bearer {token}", "accept": "application/json"}
     try:
         r = requests.get(url, headers=headers, timeout=20)
         r.raise_for_status()
         data = r.json().get("dataResult", {})
+
         return {
             "lugarId": lugar_id,
             "lugarNome": data.get("lugarNome", id_para_nome.get(lugar_id, f"ID {lugar_id}")),
             "qtdInternas": data.get("qtdInternas", 0),
+            "backlog": data.get("qtdMotosInternas", 0),
         }
     except Exception as e:
-        return {"lugarId": lugar_id, "lugarNome": "Erro", "qtdInternas": 0, "erro": str(e)}
+        return {"lugarId": lugar_id, "lugarNome": "Erro", "qtdInternas": 0, "backlog": 0, "erro": str(e)}
 
 
 # ==============================
@@ -142,11 +143,24 @@ for i, lid in enumerate(lugar_ids):
 df = pd.DataFrame(resultados)
 df = df.sort_values(by="qtdInternas", ascending=False)
 
-st.subheader(f"📍 Regional {regional_sel} — Atualizado em {datetime.now().strftime('%H:%M:%S')}")
-st.metric("Total de internas (hoje)", int(df["qtdInternas"].sum()))
+# Horário local Brasil
+hora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
+
+# ==============================
+# EXIBIÇÃO
+# ==============================
+st.subheader(f"📍 Regional {regional_sel} — Atualizado às {hora_brasil}")
+col1, col2 = st.columns(2)
+col1.metric("Total de internas (hoje)", int(df["qtdInternas"].sum()))
+col2.metric("Backlog total", int(df["backlog"].sum()))
+
 st.dataframe(
-    df[["lugarNome", "qtdInternas"]]
-    .rename(columns={"lugarNome": "Filial", "qtdInternas": "Internas feitas (hoje)"}),
+    df[["lugarNome", "qtdInternas", "backlog"]]
+    .rename(columns={
+        "lugarNome": "Filial",
+        "qtdInternas": "Internas (hoje)",
+        "backlog": "Backlog"
+    }),
     use_container_width=True,
     height=500,
 )
