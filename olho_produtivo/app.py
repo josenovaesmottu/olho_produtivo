@@ -143,6 +143,9 @@ for i, lid in enumerate(lugar_ids):
 df = pd.DataFrame(resultados)
 df = df.sort_values(by="qtdInternas", ascending=False)
 
+# Define o ID como índice
+df = df.set_index("lugarId")
+
 # Horário local Brasil
 hora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
 
