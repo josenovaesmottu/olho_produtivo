@@ -4,12 +4,16 @@ import pandas as pd
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import time
+from google.cloud import bigquery
 
 # ==============================
 # CONFIGURAÇÕES
 # ==============================
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
 st.title("⚙️ Acompanhamento de Produtividade — Mottu")
+
+
+
 
 filiais = {
     "Mottu Abaetetuba": 282, "Mottu Alagoinhas": 110, "Mottu Ananindeua": 122, "Mottu Anápolis": 58,
@@ -63,6 +67,7 @@ regionais = {
     "Rogério": [271, 274, 258, 110, 329, 69, 51, 73, 70, 76, 252, 284, 95, 115, 238, 74, 80, 109],
 }
 
+
 id_para_nome = {v: k for k, v in filiais.items()}
 
 # ==============================
@@ -71,7 +76,7 @@ id_para_nome = {v: k for k, v in filiais.items()}
 def retorna_token():
     username = st.secrets["MOTTU_USERNAME"]
     password = st.secrets["MOTTU_PASSWORD"]
-
+    
     url = "https://sso.mottu.cloud/realms/Internal/protocol/openid-connect/token"
     payload = {
         "username": username,
@@ -111,6 +116,23 @@ def get_manutencoes(lugar_id, token):
 
 
 # ==============================
+# QUERY BIGQUERY — METAS
+# ==============================
+@st.cache_data(ttl=1800)
+def get_metas():
+    client = bigquery.Client(project="dm-mottu-aluguel")
+    query = """
+        SELECT
+          filial,
+          COUNT(*) AS meta
+        FROM `dm-mottu-aluguel.exp_frota.ordem_de_producao`
+        GROUP BY filial
+    """
+    df_meta = client.query(query).to_dataframe()
+    return df_meta
+
+
+# ==============================
 # INTERFACE
 # ==============================
 regional_sel = st.selectbox("Selecione a regional:", list(regionais.keys()))
@@ -141,31 +163,62 @@ for i, lid in enumerate(lugar_ids):
     time.sleep(0.1)
 
 df = pd.DataFrame(resultados)
-df = df.sort_values(by="qtdInternas", ascending=False)
 
-# Define o ID como índice
-df = df.set_index("lugarId")
+# ==============================
+# METAS (BigQuery)
+# ==============================
+try:
+    df_meta = get_metas()
+except Exception as e:
+    st.warning(f"Erro ao carregar metas: {e}")
+    df_meta = pd.DataFrame(columns=["filial", "meta"])
 
-# Horário local Brasil
-hora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
+# Faz o merge entre nome da filial e meta
+df = df.merge(df_meta, left_on="lugarNome", right_on="filial", how="left")
+df.drop(columns=["filial"], inplace=True)
+df["meta"] = df["meta"].fillna(0)
+
+# Calcula atingimento
+df["atingimento (%)"] = (df["qtdInternas"] / df["meta"]) * 100
+df["atingimento (%)"] = df["atingimento (%)"].fillna(0).round(1)
+
+
+# ==============================
+# FUNÇÃO DE COR
+# ==============================
+def cor_atingimento(val):
+    if val < 50:
+        color = 'red'
+    elif val < 80:
+        color = 'orange'
+    else:
+        color = 'green'
+    return f'color: {color}; font-weight: bold'
+
 
 # ==============================
 # EXIBIÇÃO
 # ==============================
+df = df.sort_values(by="qtdInternas", ascending=False)
+hora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
+
 st.subheader(f"📍 Regional {regional_sel} — Atualizado às {hora_brasil}")
 col1, col2 = st.columns(2)
 col1.metric("Total de internas (hoje)", int(df["qtdInternas"].sum()))
 col2.metric("Backlog total", int(df["backlog"].sum()))
 
+styled_df = df.style.applymap(cor_atingimento, subset=["atingimento (%)"])
+
 st.dataframe(
-    df[["lugarNome", "qtdInternas", "backlog"]]
-    .rename(columns={
-        "lugarNome": "Filial",
-        "qtdInternas": "Internas (hoje)",
-        "backlog": "Backlog"
-    }),
+    styled_df.format({
+        "atingimento (%)": "{:.1f}",
+        "meta": "{:.0f}",
+        "qtdInternas": "{:.0f}",
+        "backlog": "{:.0f}"
+    }).hide(axis="index"),
     use_container_width=True,
-    height=500,
+    height=500
 )
 
 st.caption("Para atualizar automaticamente, recarregue a página após o intervalo definido.")
+
