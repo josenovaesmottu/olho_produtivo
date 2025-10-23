@@ -11,6 +11,7 @@ import time
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
 st.title("⚙️ Acompanhamento de Produtividade — Mottu")
 
+
 filiais = {
     "Mottu Abaetetuba": 282, "Mottu Alagoinhas": 110, "Mottu Ananindeua": 122, "Mottu Anápolis": 58,
     "Mottu Aparecida de Goiânia": 123, "Mottu Aracaju": 29, "Mottu Aracati": 274, "Mottu Arapiraca": 52,
@@ -51,18 +52,25 @@ filiais = {
     "Mottu Teixeira de Freitas": 284, "Mottu Teresina": 26, "Mottu Toledo": 463, "Mottu Uberaba": 78,
     "Mottu Uberlândia": 25, "Mottu Valparaíso": 310, "Mottu Vila Isabel": 225, "Mottu Vila Velha": 72,
     "Mottu Vitória": 405, "Mottu Vitória da Conquista": 80, "Mottu Vitória de Santo Antão": 250,
-    "Mottu Volta Redonda": 396, "Mottu Várzea Grande": 473
+    "Mottu Volta Redonda": 396, "Mottu Várzea Grande": 473,     "Mottu Foz do Iguaçu": 511,  "Mottu Passo Fundo": 522, "Mottu Sinop": 526,
+    "Mottu Itumbiara": 537, "Mottu Lages": 527, "Mottu Patos de Minas": 509,
+    "Mottu Cachoeiro de Itapemirim": 505, "Mottu Cariacica": 489, "Mottu Nossa Senhora do Socorro": 507,
+    "Mottu Anápolis": 58,"Mottu MX Edomex Coacalco": 499,
+    "Mottu México CDMX Iztapalapa": 87, "Mottu Campo Grande - RJ": 497,
+    "Mottu São José do Ribamar": 513, "Mottu São Mateus": 514,
+    "Mottu Poços de Caldas": 515, "Mottu Americana": 533,
+    "Mottu Marília": 536
 }
 
 regionais = {
-    "Bruno": [31, 68, 25, 63, 81, 79, 38, 62, 66, 8, 3, 19, 72, 15, 118, 40, 39],
-    "Flávio": [82, 24, 83, 33, 94, 7, 13, 37, 36, 41, 477, 86, 44, 1, 34, 35, 23],
-    "Francisco": [59, 5, 61, 30, 4, 29, 28, 27, 26, 6, 9, 114, 21, 16, 84, 18, 122, 17],
-    "Leonardo": [77, 455, 474, 416, 285, 357, 463, 397, 259, 174, 300, 55, 203, 417, 356, 372, 473, 319],
-    "Lucas": [249, 107, 42, 113, 47, 48, 106, 43, 71, 413, 11, 85, 459],
-    "Rogério": [271, 274, 258, 110, 329, 69, 51, 73, 70, 76, 252, 284, 95, 115, 238, 74, 80, 109],
+    "Bruno": [31, 62, 66, 25, 68, 63, 81, 79, 38, 8, 3, 72, 19, 15, 118, 40, 39],
+    "Flávio": [82, 24, 35, 94, 83, 36, 23, 41, 477, 37, 13, 86, 1, 7, 33, 34, 44],
+    "Francisco": [61, 5, 59, 30, 4, 29, 28, 26, 27, 6, 21, 114, 9, 84, 16, 122, 18, 17],
+    "Júlio": [22, 52, 57, 67, 78, 116, 60, 65, 32, 111, 56, 10, 46, 45, 309, 53, 58, 123, 105, 183, 173, 180, 20, 75],
+    "Leonardo": [55, 474, 259, 285, 300, 77, 511, 416, 522, 526, 537, 527, 509, 455, 505,357, 463, 397, 174, 203, 417, 356, 372, 473, 319, 489, 462, 507, 476, 469, 478, 497, 396, 366, 513, 458, 267, 514, 449, 454, 475, 472, 515, 533, 536],
+    "Lucas": [42, 48, 107, 249, 113, 47, 43, 106, 71, 499, 459, 87, 413, 85, 11],
+    "Rogério": [69, 70, 73, 74, 76, 110, 115, 271, 274, 258, 329, 51, 95, 284, 252, 238,80, 109, 49, 50, 310, 295, 405, 384, 225, 248, 266, 283, 402, 250, 365,404, 282, 64, 175, 311]
 }
-
 id_para_nome = {v: k for k, v in filiais.items()}
 
 # ==============================
@@ -169,3 +177,4 @@ st.dataframe(
 )
 
 st.caption("Para atualizar automaticamente, recarregue a página após o intervalo definido.")
+
