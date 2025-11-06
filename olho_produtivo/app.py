@@ -17,7 +17,7 @@ filiais = {
     "Mottu Aparecida de Goiânia": 123, "Mottu Aracaju": 29, "Mottu Aracati": 274, "Mottu Arapiraca": 52,
     "Mottu Araçatuba": 109, "Mottu Avaré": 454, "Mottu Barreiras": 259, "Mottu Bauru": 175,
     "Mottu Bayeux": 384, "Mottu Belo Horizonte": 3, "Mottu Belém": 18, "Mottu Blumenau": 356,
-    "Mottu Boa Vista": 61, "Mottu Bragança": 238, "Mottu Brasília": 10, "Mottu Butantã": 1,
+    "Mottu Boa Vista": 61, "Mottu Bragança": 238, "Mottu Brasília": 10, "Mottu Vila Leopoldina": 477,
     "Mottu Cabo Frio": 283, "Mottu Camaçari": 173, "Mottu Campina Grande": 38, "Mottu Campinas": 7,
     "Mottu Campo Grande": 31, "Mottu Campos dos Goytacazes": 285, "Mottu Caruaru": 39, "Mottu Cascavel": 397,
     "Mottu Castanhal": 365, "Mottu Caucaia": 458, "Mottu Caxias": 366, "Mottu Caxias do Sul": 69,
@@ -52,25 +52,27 @@ filiais = {
     "Mottu Teixeira de Freitas": 284, "Mottu Teresina": 26, "Mottu Toledo": 463, "Mottu Uberaba": 78,
     "Mottu Uberlândia": 25, "Mottu Valparaíso": 310, "Mottu Vila Isabel": 225, "Mottu Vila Velha": 72,
     "Mottu Vitória": 405, "Mottu Vitória da Conquista": 80, "Mottu Vitória de Santo Antão": 250,
-    "Mottu Volta Redonda": 396, "Mottu Várzea Grande": 473,     "Mottu Foz do Iguaçu": 511,  "Mottu Passo Fundo": 522, "Mottu Sinop": 526,
+    "Mottu Volta Redonda": 396, "Mottu Várzea Grande": 473, "Mottu Foz do Iguaçu": 511, "Mottu Passo Fundo": 522, "Mottu Sinop": 526,
     "Mottu Itumbiara": 537, "Mottu Lages": 527, "Mottu Patos de Minas": 509,
     "Mottu Cachoeiro de Itapemirim": 505, "Mottu Cariacica": 489, "Mottu Nossa Senhora do Socorro": 507,
-    "Mottu Anápolis": 58,"Mottu MX Edomex Coacalco": 499,
+    "Mottu Anápolis": 58, "Mottu MX Edomex Coacalco": 499,
     "Mottu México CDMX Iztapalapa": 87, "Mottu Campo Grande - RJ": 497,
-    "Mottu São José do Ribamar": 513, "Mottu São Mateus": 514,
+    "Mottu São José do Ribamar": 513, "Mottu São Mateus": 514, "Mottu Ourinhos": 475, "Mottu Nova Iguaçu": 478, "Mottu Madureira": 476,
     "Mottu Poços de Caldas": 515, "Mottu Americana": 533,
-    "Mottu Marília": 536
+    "Mottu Marília": 536, "Mottu Botucatu": 523, "Mottu Votuporanga": 542, "Mottu Varginha": 546, "Mottu Chapecó": 544,
+    "Mottu Caxias": 366, "Mottu Ji Paraná": 416, "Mottu Itapetininga": 449,
+    "Mottu Campos dos Goytacazes": 285, "Mottu Ponta Grossa": 319, "Mottu Cascavel": 397
 }
-
 regionais = {
-    "Bruno": [31, 62, 66, 25, 68, 63, 81, 79, 38, 8, 3, 72, 19, 15, 118, 40, 39],
-    "Flávio": [82, 24, 35, 94, 83, 36, 23, 41, 477, 37, 13, 86, 1, 7, 33, 34, 44],
     "Francisco": [61, 5, 59, 30, 4, 29, 28, 26, 27, 6, 21, 114, 9, 84, 16, 122, 18, 17],
-    "Júlio": [22, 52, 57, 67, 78, 116, 60, 65, 32, 111, 56, 10, 46, 45, 309, 53, 58, 123, 105, 183, 173, 180, 20, 75],
-    "Leonardo": [55, 474, 259, 285, 300, 77, 511, 416, 522, 526, 537, 527, 509, 455, 505,357, 463, 397, 174, 203, 417, 356, 372, 473, 319, 489, 462, 507, 476, 469, 478, 497, 396, 366, 513, 458, 267, 514, 449, 454, 475, 472, 515, 533, 536],
+    "Bruno": [31, 62, 66, 25, 68, 63, 81, 79, 38, 8, 3, 72, 19, 15, 118, 40,46, 39],
+    "Flávio": [82, 24, 35, 94, 83, 36, 23, 41, 477, 37, 13, 86, 7, 33, 34, 44],
+    "Júlio": [22, 52, 57, 74, 67, 78, 116, 60, 65, 32, 111,404, 56, 10, 45, 309, 53, 58, 123, 105,402, 183, 173, 180, 20, 75],
+    "Leonardo": [55, 474, 259, 285, 300, 77, 511, 416, 522, 526, 537, 527, 509, 455, 505, 357, 463, 397, 174, 203, 372, 473, 319, 489, 462, 507, 476, 478, 497, 396, 366, 513, 267, 514, 449, 454, 475, 472, 515, 533, 536, 523, 542, 546, 544],
     "Lucas": [42, 48, 107, 249, 113, 47, 43, 106, 71, 499, 459, 87, 413, 85, 11],
-    "Rogério": [69, 70, 73, 74, 76, 110, 115, 271, 274, 258, 329, 51, 95, 284, 252, 238,80, 109, 49, 50, 310, 295, 405, 384, 225, 248, 266, 283, 402, 250, 365,404, 282, 64, 175, 311]
+    "Rogério": [69, 70, 73, 76, 110, 115, 271, 274, 258, 329, 51, 95, 284, 252, 238, 80, 109, 49, 50, 310, 295, 405, 384, 225, 248, 266, 283, 250, 365, 282, 64, 175, 311, 469, 417, 356,  458]
 }
+regionais["Lucaiano"] = sum(regionais.values(), [])
 id_para_nome = {v: k for k, v in filiais.items()}
 
 # ==============================
@@ -177,4 +179,5 @@ st.dataframe(
 )
 
 st.caption("Para atualizar automaticamente, recarregue a página após o intervalo definido.")
+
 
