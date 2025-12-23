@@ -56,19 +56,15 @@ col3.metric("Rampas ativas", int(df["rampas_ativas"].sum()))
 
 st.divider()
 
-# Função para gerar cor do vermelho ao verde baseado na proporção
+# Função para gerar cor baseado na proporção
 def get_progress_color(ratio):
-    """Retorna cor de vermelho (0%) → amarelo (50%) → verde (100%)"""
-    ratio = min(max(ratio, 0), 1)  # Clamp entre 0 e 1
-    if ratio < 0.5:
-        # Vermelho → Amarelo (0% a 50%)
-        red = 255
-        green = int(255 * (ratio * 2))
+    """Retorna cor: vermelho (<40%), amarelo (40-80%), verde (>80%)"""
+    if ratio < 0.4:
+        return "#dc3545"  # Vermelho
+    elif ratio < 0.8:
+        return "#ffc107"  # Amarelo
     else:
-        # Amarelo → Verde (50% a 100%)
-        red = int(255 * (1 - (ratio - 0.5) * 2))
-        green = 255
-    return f"rgb({red}, {green}, 0)"
+        return "#28a745"  # Verde
 
 # Headers
 col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
