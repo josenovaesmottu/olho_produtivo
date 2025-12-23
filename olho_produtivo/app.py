@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 import time
 import json
 from pathlib import Path
+from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
 
@@ -23,12 +24,7 @@ regional_sel = st.selectbox("Selecione o regional:", regionais)
 intervalo = st.number_input("Atualizar automaticamente (minutos):", min_value=1, max_value=30, value=5)
 st.caption("O dashboard atualiza automaticamente a cada intervalo definido ou manualmente.")
 
-# Inicializa timestamp da última atualização
-if "last_update" not in st.session_state:
-    st.session_state.last_update = time.time()
-
 if st.button("🔄 Atualizar agora"):
-    st.session_state.last_update = time.time()
     st.rerun()
 
 filiais_interesse = filiais[regional_sel]
@@ -136,19 +132,8 @@ for _, row in df.iterrows():
 
 st.divider()
 
-# Auto-refresh: verifica se passou o intervalo e dispara rerun
-tempo_decorrido = time.time() - st.session_state.last_update
-tempo_restante = (intervalo * 60) - tempo_decorrido
-
-if tempo_restante <= 0:
-    st.session_state.last_update = time.time()
-    st.rerun()
-else:
-    minutos_restantes = int(tempo_restante // 60)
-    segundos_restantes = int(tempo_restante % 60)
-    st.caption(f"Próxima atualização em: {minutos_restantes}m {segundos_restantes}s")
-    time.sleep(1)
-    st.rerun()
+# Auto-refresh a cada intervalo definido (em milissegundos)
+st_autorefresh(interval=intervalo * 60 * 1000, key="auto_refresh")
 
 
 
