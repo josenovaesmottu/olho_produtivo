@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 import time
 import json
 from pathlib import Path
-from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
 
