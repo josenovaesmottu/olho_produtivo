@@ -14,17 +14,17 @@ st.title("⚙️ Acompanhamento de Produtividade — Mottu")
 
 filiais_path = Path(__file__).parent / "filiais.json"
 filiais = json.load(filiais_path.open("r", encoding="utf-8"))
-regionais = ["Bruno","Flávio","Francisco","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério","Luciano"]
+regionais = ["Bruno","Flávio","Francisco","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
 
 token = retorna_token()
 
-regional_sel = st.selectbox("Selecione a regional:", regionais)
+regional_sel = st.selectbox("Selecione o regional:", regionais)
 #regional_sel = "Francisco"
 intervalo = st.number_input("Atualizar automaticamente (minutos):", min_value=1, max_value=30, value=5)
 st.caption("O dashboard atualiza automaticamente a cada intervalo definido ou manualmente.")
 
 if st.button("🔄 Atualizar agora"):
-    st.experimental_rerun()
+    st.rerun()
 
 filiais_interesse = filiais[regional_sel]
 progress = st.progress(0)
