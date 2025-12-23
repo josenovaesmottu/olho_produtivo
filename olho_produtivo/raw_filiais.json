@@ -930,18 +930,6 @@
   "meta_internas": "16"
 }, {
   "gerente_regional": "Flávio",
-  "lugar": "Mottu São Mateus",
-  "lugarid": "514",
-  "mec_rampa_ideal": null,
-  "meta_internas": "1"
-}, {
-  "gerente_regional": "Flávio",
-  "lugar": "Mottu Butantã",
-  "lugarid": "1",
-  "mec_rampa_ideal": null,
-  "meta_internas": "2"
-}, {
-  "gerente_regional": "Flávio",
   "lugar": "Mottu Guarulhos",
   "lugarid": "83",
   "mec_rampa_ideal": "12.0",

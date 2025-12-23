@@ -2,4 +2,5 @@ select cf.gerente_regional, lugar, lugarid, mri.mec_rampa_ideal, op.meta_interna
 from `exp_atendimentos.cadastro_filiais` cf
 left join `exp_frota.mecanicos_rampa_ideal` mri on mri.filial = cf.lugar
 left join (select filial, count(*) as meta_internas from `exp_frota.ordem_de_producao` group by all) op on op.filial = cf.lugar
-where cf.terceiro = 0 and cf.filial_ativa = 1 and cf.gerente_regional not in ("Jessica","Indefinido")
+where cf.terceiro = 0 and cf.filial_ativa = 1 and cf.gerente_regional not in ("Jessica","Indefinido") and lugar not in ("Mottu Butantã","Mottu São Mateus")
+order by gerente_regional, lugarid

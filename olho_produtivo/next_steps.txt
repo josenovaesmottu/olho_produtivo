@@ -1,0 +1,8 @@
+ monitoramento em tempo real dos KPIs
+ 	- tempo produtivo
+ 		- tempo ocioso
+ 		- tempo estourado
+ 		- tempo perdido
+ 	- ocupação de rampas OK
+ 	- box rápido
+ 	- fila de motos
