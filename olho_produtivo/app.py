@@ -23,7 +23,12 @@ regional_sel = st.selectbox("Selecione o regional:", regionais)
 intervalo = st.number_input("Atualizar automaticamente (minutos):", min_value=1, max_value=30, value=5)
 st.caption("O dashboard atualiza automaticamente a cada intervalo definido ou manualmente.")
 
+# Inicializa timestamp da última atualização
+if "last_update" not in st.session_state:
+    st.session_state.last_update = time.time()
+
 if st.button("🔄 Atualizar agora"):
+    st.session_state.last_update = time.time()
     st.rerun()
 
 filiais_interesse = filiais[regional_sel]
@@ -130,7 +135,20 @@ for _, row in df.iterrows():
             st.write("—")
 
 st.divider()
-st.caption("Para atualizar automaticamente, recarregue a página após o intervalo definido.")
+
+# Auto-refresh: verifica se passou o intervalo e dispara rerun
+tempo_decorrido = time.time() - st.session_state.last_update
+tempo_restante = (intervalo * 60) - tempo_decorrido
+
+if tempo_restante <= 0:
+    st.session_state.last_update = time.time()
+    st.rerun()
+else:
+    minutos_restantes = int(tempo_restante // 60)
+    segundos_restantes = int(tempo_restante % 60)
+    st.caption(f"Próxima atualização em: {minutos_restantes}m {segundos_restantes}s")
+    time.sleep(1)
+    st.rerun()
 
 
 
