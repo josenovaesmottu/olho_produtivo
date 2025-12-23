@@ -64,6 +64,13 @@ def get_progress_color(ratio):
     green = int(255 * ratio)
     return f"rgb({red}, {green}, 50)"
 
+# Headers
+col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
+col_nome.markdown("**Filial**")
+col_backlog.markdown("**Backlog**")
+col_internas.markdown("**Internas**")
+col_rampas.markdown("**Rampas Ativas**")
+
 # Exibir cada filial
 for _, row in df.iterrows():
     nome = row["nome"]
@@ -84,17 +91,19 @@ for _, row in df.iterrows():
         st.write(f"**{nome}**")
     
     with col_backlog:
-        st.metric("Backlog", backlog, label_visibility="collapsed")
+        st.write(f"{backlog}")
     
     with col_internas:
-        # Barra de progresso internas (vermelho → verde)
+        # Barra de progresso internas (vermelho → verde) com valores nas laterais
         cor = get_progress_color(prop_internas)
         pct = min(prop_internas * 100, 100)
         st.markdown(f"""
-        <div style="background-color: #ddd; border-radius: 5px; height: 25px; width: 100%;">
-            <div style="background-color: {cor}; width: {pct}%; height: 100%; border-radius: 5px; text-align: center; color: white; font-size: 12px; line-height: 25px;">
-                {internas}/{meta_interna}
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: bold; min-width: 25px;">{internas}</span>
+            <div style="background-color: #ddd; border-radius: 5px; height: 20px; flex: 1;">
+                <div style="background-color: {cor}; width: {pct}%; height: 100%; border-radius: 5px;"></div>
             </div>
+            <span style="color: #666; min-width: 25px;">{meta_interna}</span>
         </div>
         """, unsafe_allow_html=True)
     
@@ -107,13 +116,13 @@ for _, row in df.iterrows():
                     color = "#28a745"  # Verde - ativa
                 else:
                     color = "#dc3545"  # Vermelho - inativa
-                segments_html += f'<div style="flex: 1; background-color: {color}; height: 25px; margin: 0 1px; border-radius: 3px;"></div>'
+                segments_html += f'<div style="flex: 1; background-color: {color}; height: 20px; margin: 0 1px; border-radius: 3px;"></div>'
             
             st.markdown(f"""
             <div style="display: flex; width: 100%;">
                 {segments_html}
             </div>
-            <div style="text-align: center; font-size: 11px; color: #666;">{int(rampas_ativas)}/{int(meta_rampa)} rampas</div>
+            <div style="text-align: center; font-size: 11px; color: #666;">{int(rampas_ativas)}/{int(meta_rampa)}</div>
             """, unsafe_allow_html=True)
         else:
             st.write("—")
