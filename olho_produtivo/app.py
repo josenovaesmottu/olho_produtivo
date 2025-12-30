@@ -16,7 +16,7 @@ st.title("⚙️ Acompanhamento de Produtividade — Mottu")
 
 filiais_path = Path(__file__).parent / "filiais.json"
 filiais = json.load(filiais_path.open("r", encoding="utf-8"))
-regionais = ["GERAL","Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
+regionais = ["Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
 
 token = retorna_token()
 
@@ -26,10 +26,7 @@ st.caption("O dashboard atualiza automaticamente a cada 15min definido ou manual
 if st.button("🔄 Atualizar agora"):
     st.rerun()
 
-if regional_sel != "GERAL":
-    filiais_interesse = filiais[regional_sel]
-else:
-    filiais_interesse = filiais
+filiais_interesse = filiais[regional_sel]
 
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
