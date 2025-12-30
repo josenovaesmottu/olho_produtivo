@@ -6,21 +6,22 @@ from zoneinfo import ZoneInfo
 import time
 import json
 from pathlib import Path
+from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
 
+st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
 st.title("⚙️ Acompanhamento de Produtividade — Mottu")
 
 filiais_path = Path(__file__).parent / "filiais.json"
 filiais = json.load(filiais_path.open("r", encoding="utf-8"))
-regionais = ["Bruno","Flávio","Francisco","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério", "GERAL"]
+regionais = ["GERAL","Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
 
 token = retorna_token()
 
 regional_sel = st.selectbox("Selecione o regional:", regionais)
-intervalo = st.number_input("Atualizar automaticamente (minutos):", min_value=1, max_value=30, value=5)
-st.caption("O dashboard atualiza automaticamente a cada intervalo definido ou manualmente.")
+st.caption("O dashboard atualiza automaticamente a cada 15min definido ou manualmente.")
 
 if st.button("🔄 Atualizar agora"):
     st.rerun()
