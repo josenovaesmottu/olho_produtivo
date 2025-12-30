@@ -29,7 +29,7 @@ if regional_sel != "GERAL":
     filiais_interesse = filiais[regional_sel]
 else:
     filiais_interesse = filiais
-    
+
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)

@@ -10,10 +10,10 @@ def get_historico_por_mecanico(mecanicoId, token):
         r = requests.get(url, headers=headers, timeout=20)
         r.raise_for_status()
         manutencoes = r.json()["dataResult"]["manutencoes"]
-        finalizadas = 0
+        finalizadas = set()
         for manutencao in manutencoes:
             if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(date.today()):
-                finalizadas += 1
+                finalizadas.add(manutencao["id"])
         return finalizadas
 
     except Exception as e:
@@ -29,18 +29,18 @@ def get_parciais(lugar_id, token):
         data = r.json().get("dataResult", {})
 
         backlog = data.get("qtdMotosInternas", 0)
-        internas_feitas = 0
+        internas_feitas = set()
         debug = []
         for mecanico in data["manutencoesMecanico"]:
             if isinstance(mecanico["mecanicoId"], int) and mecanico["nome"] != "N/A":
                 #realizadas = mecanico.get("qtdInternas", 0)
                 #finalizadas =  min(historico,realizadas) 
                 finalizadas = get_historico_por_mecanico(mecanico["mecanicoId"],token)
-                debug.append({"nome": mecanico["nome"], "id":mecanico["mecanicoId"], "finalizadas": finalizadas})
-                internas_feitas += finalizadas
+                debug.append({"nome": mecanico["nome"], "id":mecanico["mecanicoId"], "finalizadas": len(finalizadas)})
+                internas_feitas.update(finalizadas)
 
         return {
-            "qtdInternas": internas_feitas,
+            "qtdInternas": len(internas_feitas),
             "backlog": backlog ,
         }
 
