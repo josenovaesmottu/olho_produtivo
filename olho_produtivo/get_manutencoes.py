@@ -30,15 +30,17 @@ def get_parciais(lugar_id, token):
 
         backlog = data.get("qtdMotosInternas", 0)
         internas_feitas = 0
+        debug = []
         for mecanico in data["manutencoesMecanico"]:
-            if mecanico["mecanicoId"] is int and mecanico["nome"] != "N/A":
+            if isinstance(mecanico["mecanicoId"], int) and mecanico["nome"] != "N/A":
                 #realizadas = mecanico.get("qtdInternas", 0)
                 #finalizadas =  min(historico,realizadas) 
                 finalizadas = get_historico_por_mecanico(mecanico["mecanicoId"],token)
+                debug.append({"nome": mecanico["nome"], "id":mecanico["mecanicoId"], "finalizadas": finalizadas})
                 internas_feitas += finalizadas
 
         return {
-            "qtdInternas": data.get("qtdInternas", 0),
+            "qtdInternas": internas_feitas,
             "backlog": backlog ,
         }
 

@@ -19,7 +19,6 @@ regionais = ["Bruno","Flávio","Francisco","Júlio","Leonardo","Luan","Lucas","M
 token = retorna_token()
 
 regional_sel = st.selectbox("Selecione o regional:", regionais)
-#regional_sel = "Francisco"
 intervalo = st.number_input("Atualizar automaticamente (minutos):", min_value=1, max_value=30, value=5)
 st.caption("O dashboard atualiza automaticamente a cada intervalo definido ou manualmente.")
 
@@ -27,6 +26,7 @@ if st.button("🔄 Atualizar agora"):
     st.rerun()
 
 filiais_interesse = filiais[regional_sel]
+
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
