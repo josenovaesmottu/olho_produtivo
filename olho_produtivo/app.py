@@ -21,7 +21,7 @@ regionais = ["Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","M
 token = retorna_token()
 
 regional_sel = st.selectbox("Selecione o regional:", regionais)
-st.caption("O dashboard atualiza automaticamente a cada 15min definido ou manualmente.")
+st.caption("O dashboard atualiza automaticamente a cada 15min ou manualmente.")
 
 if st.button("🔄 Atualizar agora"):
     st.rerun()
