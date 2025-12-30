@@ -2,8 +2,8 @@ import requests
 import streamlit as st
 
 def retorna_token():
-    #username = st.secrets["MOTTU_USERNAME"]
-    #password = st.secrets["MOTTU_PASSWORD"]
+    username = st.secrets["MOTTU_USERNAME"]
+    password = st.secrets["MOTTU_PASSWORD"]
 
     url = "https://sso.mottu.cloud/realms/Internal/protocol/openid-connect/token"
     payload = {
