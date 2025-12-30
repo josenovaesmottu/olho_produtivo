@@ -1,5 +1,23 @@
 import requests
 import streamlit as st
+from datetime import date
+
+
+def get_historico_por_mecanico(mecanicoId, token):
+    url = f"https://maintenance-backend.mottu.cloud/api/v2.6/Manutencao/HistoricoPorMecanico?mecanicoId={mecanicoId}&pagina=1&quantidadePorPagina=30"
+    headers = {"Authorization": f"Bearer {token}", "accept": "application/json"}
+    try:
+        r = requests.get(url, headers=headers, timeout=20)
+        r.raise_for_status()
+        manutencoes = r.json()["dataResult"]["manutencoes"]
+        finalizadas = 0
+        for manutencao in manutencoes:
+            if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(date.today()):
+                finalizadas += 1
+        return finalizadas
+
+    except Exception as e:
+        return 0
 
 
 def get_parciais(lugar_id, token):
@@ -14,7 +32,10 @@ def get_parciais(lugar_id, token):
         internas_feitas = 0
         for mecanico in data["manutencoesMecanico"]:
             if mecanico["mecanicoId"] is int and mecanico["nome"] != "N/A":
-                internas_feitas += mecanico.get("qtdInternas", 0)
+                #realizadas = mecanico.get("qtdInternas", 0)
+                #finalizadas =  min(historico,realizadas) 
+                finalizadas = get_historico_por_mecanico(mecanico["mecanicoId"],token)
+                internas_feitas += finalizadas
 
         return {
             "qtdInternas": data.get("qtdInternas", 0),
