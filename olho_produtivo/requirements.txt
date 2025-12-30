@@ -1,9 +1,1 @@
-requests
-streamlit
-pandas
-datetime 
-zoneinfo 
-time
-json
-pathlib
 streamlit_autorefresh
