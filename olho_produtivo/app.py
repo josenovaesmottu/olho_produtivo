@@ -60,7 +60,22 @@ hora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%H:%M:%S")
 st.subheader(f"📍 Regional {regional_sel} — Atualizado às {hora_brasil}")
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Total de internas (hoje)", int(df["internas_realizadas"].sum()))
+total_internas = int(df["internas_realizadas"].sum())
+meta_total_internas = int(df["meta_interna"].fillna(0).sum())
+prop_total_internas = safe_divide(total_internas, meta_total_internas)
+cor_total_internas = get_progress_color(prop_total_internas)
+pct_total_internas = min(prop_total_internas * 100, 100)
+with col1:
+    st.markdown("**Total de internas (hoje)**")
+    st.markdown(f"""
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: bold; min-width: 25px;">{total_internas}</span>
+        <div style="background-color: #ddd; border-radius: 5px; height: 20px; flex: 1;">
+            <div style="background-color: {cor_total_internas}; width: {pct_total_internas}%; height: 100%; border-radius: 5px;"></div>
+        </div>
+        <span style="color: #666; min-width: 25px;">{meta_total_internas}</span>
+    </div>
+    """, unsafe_allow_html=True)
 col2.metric("Backlog total", int(df["backlog"].sum()))
 col3.metric("Rampas ativas", int(df["rampas_ativas"].sum()))
 
