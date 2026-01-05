@@ -71,7 +71,7 @@ col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
 col_nome.markdown("**Filial**")
 col_backlog.markdown("**Backlog**")
 col_internas.markdown("**Internas**")
-col_rampas.markdown("**Rampas Ativas**")
+col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
 
 # Exibir cada filial
 for _, row in df.iterrows():
