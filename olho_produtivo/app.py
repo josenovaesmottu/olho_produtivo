@@ -32,6 +32,19 @@ if regional_sel == "GERAL":
 else:
     filiais_interesse = filiais[regional_sel]
 
+########################################## para testes
+
+""" filiais_interesse = [
+        {
+      "nome": "Mottu Maracanaú",
+      "id": "180",
+      "meta_interna": 10,
+      "meta_rampa": 5.0
+        }
+    ] 
+ """
+########################################## para testes
+
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
@@ -43,8 +56,8 @@ for i, filial in enumerate(filiais_interesse):
     filial["rampas_clientes"] = rampas["clientes"]
     filial["rampas_internas"] = rampas["internas"]
 
-    filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], rampas["meta_interna"])
-    filial["ocupacao_rampas"] = safe_divide(filial["rampas_ativas"], rampas["meta_rampa"])
+    filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], filial["meta_interna"])
+    filial["ocupacao_rampas"] = safe_divide(filial["rampas_ativas"], filial["meta_rampa"])
 
     progress.progress((i + 1) / len(filiais_interesse))
 

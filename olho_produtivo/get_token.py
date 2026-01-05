@@ -9,6 +9,7 @@ def retorna_token():
     payload = {
         "username": username,
         "password": password,
+
         "grant_type": "password",
         "client_id": "admin-v3-frontend-client",
     }
