@@ -13,7 +13,7 @@ from funcoes_auxiliares import get_progress_color, safe_divide
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
-st.title("⚙️ Acompanhamento de Produtividade — Mottu")
+st.title("⚙️ PAINEL DE PRODUÇÃO")
 
 filiais_path = Path(__file__).parent / "filiais.json"
 filiais = json.load(filiais_path.open("r", encoding="utf-8"))
