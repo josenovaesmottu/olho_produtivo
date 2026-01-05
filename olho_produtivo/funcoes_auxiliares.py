@@ -8,6 +8,7 @@ def get_progress_color(ratio):
         return "#28a745"  # Verde
 
 def safe_divide(numerator, denominator):
-    if denominator == 0:
+    try:
+        return numerator / denominator
+    except Exception as e:
         return 0
-    return numerator / denominator
