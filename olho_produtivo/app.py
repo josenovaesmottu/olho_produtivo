@@ -32,19 +32,6 @@ if regional_sel == "GERAL":
 else:
     filiais_interesse = filiais[regional_sel]
 
-########################################## para testes
-
-""" filiais_interesse = [
-        {
-      "nome": "Mottu Maracanaú",
-      "id": "180",
-      "meta_interna": 10,
-      "meta_rampa": 5.0
-        }
-    ] 
- """
-########################################## para testes
-
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
@@ -128,7 +115,7 @@ for _, row in df.iterrows():
         # Barra segmentada de rampas
         if meta_rampa > 0:
             segments_html = ""
-            for j in range(int(meta_rampa),start=1):
+            for j in range(1,int(meta_rampa)+1):
                 if j <= rampas_clientes:
                     color = "#3632a8" # azul - cliente
                 elif j <= (rampas_internas + rampas_clientes):
