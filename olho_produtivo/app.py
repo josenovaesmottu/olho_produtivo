@@ -50,7 +50,7 @@ for i, filial in enumerate(filiais_interesse):
 
 
 df = pd.DataFrame(filiais_interesse)
-df = df.sort_values(by="progresso_internas", ascending=True)
+df = df.sort_values(by="progresso_internas", ascending=False)
 
 # ==============================
 # EXIBIÇÃO
