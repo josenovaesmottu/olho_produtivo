@@ -9,6 +9,7 @@ from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
+from funcoes_auxiliares import get_progress_color, safe_divide
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -39,12 +40,17 @@ for i, filial in enumerate(filiais_interesse):
     filial["internas_realizadas"] = parcial["qtdInternas"]
     filial["backlog"] = parcial["backlog"]
     filial["rampas_ativas"] = rampas["rampas_ativas"]
- 
+    filial["rampas_clientes"] = rampas["clientes"]
+    filial["rampas_internas"] = rampas["internas"]
+
+    filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], rampas["meta_interna"])
+    filial["ocupacao_rampas"] = safe_divide(filial["rampas_ativas"], rampas["meta_rampa"])
+
     progress.progress((i + 1) / len(filiais_interesse))
 
 
 df = pd.DataFrame(filiais_interesse)
-df = df.sort_values(by="internas_realizadas", ascending=False)
+df = df.sort_values(by="progresso_internas", ascending=True)
 
 # ==============================
 # EXIBIÇÃO
@@ -60,16 +66,6 @@ col3.metric("Rampas ativas", int(df["rampas_ativas"].sum()))
 
 st.divider()
 
-# Função para gerar cor baseado na proporção
-def get_progress_color(ratio):
-    """Retorna cor: vermelho (<40%), amarelo (40-80%), verde (>80%)"""
-    if ratio < 0.4:
-        return "#dc3545"  # Vermelho
-    elif ratio < 0.8:
-        return "#ffc107"  # Amarelo
-    else:
-        return "#28a745"  # Verde
-
 # Headers
 col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
 col_nome.markdown("**Filial**")
@@ -84,11 +80,13 @@ for _, row in df.iterrows():
     internas = row["internas_realizadas"] or 0
     meta_interna = row["meta_interna"] or 1
     rampas_ativas = row["rampas_ativas"] or 0
+    rampas_clientes = row["rampas_clientes"] or 0
+    rampas_internas = row["rampas_internas"] or 0
     meta_rampa = row["meta_rampa"] or 0
     
     # Calcular proporções
-    prop_internas = internas / meta_interna if meta_interna > 0 else 0
-    prop_rampas = rampas_ativas / meta_rampa if meta_rampa > 0 else 0
+    prop_internas = row["progresso_internas"]
+    prop_rampas = row["ocupacao_rampas"]
     
     # Layout: Nome | Backlog | Barra Internas | Barra Rampas
     col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
@@ -117,9 +115,11 @@ for _, row in df.iterrows():
         # Barra segmentada de rampas
         if meta_rampa > 0:
             segments_html = ""
-            for j in range(int(meta_rampa)):
-                if j < rampas_ativas:
-                    color = "#28a745"  # Verde - ativa
+            for j in range(int(meta_rampa),start=1):
+                if j <= rampas_clientes:
+                    color = "#3632a8" # azul - cliente
+                elif j <= (rampas_internas + rampas_clientes):
+                    color = "#28a745"  # Verde - interna
                 else:
                     color = "#dc3545"  # Vermelho - inativa
                 segments_html += f'<div style="flex: 1; background-color: {color}; height: 20px; margin: 0 1px; border-radius: 3px;"></div>'

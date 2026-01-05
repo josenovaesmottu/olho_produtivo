@@ -19,7 +19,6 @@ def get_historico_por_mecanico(mecanicoId, token):
     except Exception as e:
         return 0
 
-
 def get_parciais(lugar_id, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2/Manutencao/Realizadas/Lugar/{lugar_id}"
     headers = {"Authorization": f"Bearer {token}", "accept": "application/json"}
@@ -55,13 +54,24 @@ def get_rampas(lugar_id, token):
         r.raise_for_status()
         data = r.json()["dataResult"]["manutencoes"]
         rampas_ativas = 0
-        for manutencoes in data:
-            if "rampa" in manutencoes["plataforma"].lower() or "box" in manutencoes["plataforma"].lower():
+        internas = 0
+        clientes = 0
+        for manutencao in data:
+            if "rampa" in manutencao["plataforma"].lower() or "box" in manutencao["plataforma"].lower():
                 rampas_ativas += 1
-
+                if manutencao["tipo"] in [3,4,6,9,15]:
+                    internas += 1
+                if manutencao["tipo"] in [1,2,5,7,10,11,12,13]:
+                    clientes += 1
         return {
             "rampas_ativas": rampas_ativas,
+            "clientes": clientes,
+            "internas": internas,
         }
 
     except Exception as e:
-        return {"rampas_ativas": 0}
+        return {
+            "rampas_ativas": 0,
+            "clientes": 0,
+            "internas": 0,
+        }
