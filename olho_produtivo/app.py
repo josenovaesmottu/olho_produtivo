@@ -104,14 +104,7 @@ for _, row in df.iterrows():
     
     # Layout: Nome | Backlog | Barra Internas | Barra Rampas
     col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
-    
-    with col_nome:
-        # Formatar nome da filial para o link (remover "Mottu " e converter para minúsculo)
-        nome_formatado = nome.replace("Mottu ", "").lower()
-        # Criar link para o Olho Vivo
-        link = f"https://olhovivo.streamlit.app/#olho-vivo-operacao-mottu-{nome_formatado}"
-        st.markdown(f"**[{nome}]({link})**")
-    
+        
     with col_backlog:
         st.write(f"{backlog}")
     
