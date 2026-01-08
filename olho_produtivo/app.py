@@ -39,9 +39,8 @@ for i, filial in enumerate(filiais_interesse):
 
     filial["internas_realizadas"] = parcial["qtdInternas"]
     filial["backlog"] = parcial["backlog"]
-    filial["rampas_ativas"] = rampas["rampas_ativas"]
-    filial["rampas_clientes"] = rampas["clientes"]
-    filial["rampas_internas"] = rampas["internas"]
+    filial["rampas"] = rampas
+    filial["rampas_ativas"] = len(rampas)
 
     filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], filial["meta_interna"])
     filial["ocupacao_rampas"] = safe_divide(filial["rampas_ativas"], filial["meta_rampa"])
@@ -95,8 +94,8 @@ for _, row in df.iterrows():
     internas = row["internas_realizadas"] or 0
     meta_interna = row["meta_interna"] or 1
     rampas_ativas = row["rampas_ativas"] or 0
-    rampas_clientes = row["rampas_clientes"] or 0
-    rampas_internas = row["rampas_internas"] or 0
+    #rampas_clientes = row["rampas_clientes"] or 0
+    #rampas_internas = row["rampas_internas"] or 0
     meta_rampa = row["meta_rampa"] or 0
     
     # Calcular proporções
@@ -130,20 +129,44 @@ for _, row in df.iterrows():
         # Barra segmentada de rampas
         if meta_rampa > 0:
             segments_html = ""
-            for j in range(1,int(meta_rampa)+1):
-                if j <= rampas_clientes:
-                    color = "#3632a8" # azul - cliente
-                elif j <= (rampas_internas + rampas_clientes):
-                    color = "#28a745"  # Verde - interna
+            rampas_list = row["rampas"]
+            total_slots = max(len(rampas_list), int(meta_rampa))
+            
+            # Iterar sobre cada slot de rampa
+            for j in range(total_slots):
+                # Se temos uma rampa neste índice
+                if j < len(rampas_list):
+                    rampa = rampas_list[j]
+                    # Verificar o tipo da rampa
+                    if rampa["tipo_manutencao"] == "Cliente":
+                        color = "#3632a8"  # Azul - cliente
+                    else:
+                        color = "#28a745"  # Verde - interna
+                    
+                    # Verificar se é box rápido
+                    border_style = ""
+                    if rampa.get("box_rapido", False):
+                        # Borda quadriculada para box rápido (estilo bandeira F1)
+                        border_style = "border: 2px dashed white; background-image: linear-gradient(45deg, rgba(255,255,255,.3) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.3) 50%, rgba(255,255,255,.3) 75%, transparent 75%, transparent); background-size: 8px 8px;"
+                    
+                    # Criar tooltip com informações da rampa
+                    tooltip = f"Mecânico: {rampa.get('mecanico', 'N/A')}\nPlataforma: {rampa.get('plataforma', 'N/A')}\nPlaca: {rampa.get('placa', 'N/A')}\nTipo: {rampa.get('tipo_manutencao', 'N/A')}\nBox Rápido: {'Sim' if rampa.get('box_rapido') else 'Não'}"
+                    
+                    # Escapar aspas para não quebrar o HTML
+                    tooltip = tooltip.replace('"', '&quot;')
                 else:
+                    # Slot vazio (abaixo da meta)
                     color = "#dc3545"  # Vermelho - inativa
-                segments_html += f'<div style="flex: 1; background-color: {color}; height: 20px; margin: 0 1px; border-radius: 3px;"></div>'
+                    border_style = ""
+                    tooltip = "Rampa vazia"
+                
+                segments_html += f'<div style="flex: 1; background-color: {color}; height: 20px; margin: 0 1px; border-radius: 3px; {border_style}" title="{tooltip}"></div>'
             
             st.markdown(f"""
             <div style="display: flex; width: 100%;">
                 {segments_html}
             </div>
-            <div style="text-align: center; font-size: 11px; color: #666;">{int(rampas_ativas)}/{int(meta_rampa)}</div>
+            <div style="text-align: center; font-size: 11px; color: #666;">{len(rampas_list)}/{total_slots}</div>
             """, unsafe_allow_html=True)
         else:
             st.write("—")
