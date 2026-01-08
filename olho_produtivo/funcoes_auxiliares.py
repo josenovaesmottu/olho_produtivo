@@ -23,3 +23,10 @@ def ordem_rampas(rampa):
         return 1
     else:
         return 2
+
+def safe_int(value, default):
+    """Converte valor para inteiro de forma segura, retornando default em caso de erro"""
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default

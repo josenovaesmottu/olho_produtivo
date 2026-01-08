@@ -9,7 +9,7 @@ from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
-from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas
+from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -32,6 +32,7 @@ if regional_sel == "-- GRANDES + JUMBO --":
 else:
     filiais_interesse = filiais[regional_sel]
 
+filiais_interesse = filiais["Luan"]
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
@@ -92,13 +93,13 @@ col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
 # Exibir cada filial
 for _, row in df.iterrows():
     nome = row["nome"]
-    backlog = int(row["backlog"]) or 0
-    internas = row["internas_realizadas"] or 0
-    meta_interna = int(row["meta_interna"]) or 1
-    rampas_ativas = int(row["rampas_ativas"]) or 0
+    backlog = safe_int(row["backlog"],0)
+    internas = safe_int(row["internas_realizadas"],0)
+    meta_interna = safe_int(row["meta_interna"], 1)  # Default 1 para evitar divisão por zero
+    rampas_ativas = safe_int(row["rampas_ativas"],0)
     #rampas_clientes = row["rampas_clientes"] or 0
     #rampas_internas = row["rampas_internas"] or 0
-    meta_rampa = int(row["meta_rampa"]) or 0
+    meta_rampa = safe_int(row["meta_rampa"],1)
     
     # Calcular proporções
     prop_internas = row["progresso_internas"]
