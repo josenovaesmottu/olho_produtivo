@@ -32,7 +32,6 @@ if regional_sel == "-- GRANDES + JUMBO --":
 else:
     filiais_interesse = filiais[regional_sel]
 
-filiais_interesse = filiais["Luan"]
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
