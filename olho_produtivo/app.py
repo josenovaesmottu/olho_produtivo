@@ -106,7 +106,11 @@ for _, row in df.iterrows():
     col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
     
     with col_nome:
-        st.write(f"**{nome}**")
+        # Formatar nome da filial para o link (remover "Mottu " e converter para minúsculo)
+        nome_formatado = nome.replace("Mottu ", "").lower()
+        # Criar link para o Olho Vivo
+        link = f"https://olhovivo.streamlit.app/#olho-vivo-operacao-mottu-{nome_formatado}"
+        st.markdown(f"**[{nome}]({link})**")
     
     with col_backlog:
         st.write(f"{backlog}")
@@ -129,7 +133,8 @@ for _, row in df.iterrows():
         # Barra segmentada de rampas
         if meta_rampa > 0:
             segments_html = ""
-            rampas_list = row["rampas"]
+            # Ordenar rampas: box_rapido=True primeiro
+            rampas_list = sorted(row["rampas"], key=lambda x: 0 if x.get("box_rapido", False) else 1)
             total_slots = max(len(rampas_list), int(meta_rampa))
             
             # Iterar sobre cada slot de rampa
