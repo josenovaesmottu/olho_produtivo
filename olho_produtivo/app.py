@@ -32,8 +32,6 @@ if regional_sel == "-- GRANDES + JUMBO --":
 else:
     filiais_interesse = filiais[regional_sel]
 
-filiais_interesse =[{"nome": "Mottu Recife", "id": "16", "meta_interna": 15, "meta_rampa": 9.0}]
-
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
