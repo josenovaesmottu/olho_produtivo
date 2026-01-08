@@ -105,6 +105,9 @@ for _, row in df.iterrows():
     # Layout: Nome | Backlog | Barra Internas | Barra Rampas
     col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
         
+    with col_nome:
+        st.write(f"{nome}")
+    
     with col_backlog:
         st.write(f"{backlog}")
     
@@ -164,7 +167,7 @@ for _, row in df.iterrows():
             <div style="display: flex; width: 100%;">
                 {segments_html}
             </div>
-            <div style="text-align: center; font-size: 11px; color: #666;">{len(rampas_list)}/{total_slots}</div>
+            <div style="text-align: center; font-size: 11px; color: #666;">{len(rampas_list)}/{meta_rampa}</div>
             """, unsafe_allow_html=True)
         else:
             st.write("—")
