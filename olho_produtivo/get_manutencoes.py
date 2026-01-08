@@ -10,14 +10,17 @@ def get_historico_por_mecanico(mecanicoId, token):
         r = requests.get(url, headers=headers, timeout=20)
         r.raise_for_status()
         manutencoes = r.json()["dataResult"]["manutencoes"]
-        finalizadas = set()
+        finalizadas = []
         for manutencao in manutencoes:
             if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(date.today()):
-                finalizadas.add(manutencao["id"])
+                finalizadas.append({
+                    "id": manutencao["id"],
+                    "placa": manutencao["placa"]
+                })
         return finalizadas
 
     except Exception as e:
-        return 0
+        return [{"id": 0, "placa": "Erro"}]
 
 def get_parciais(lugar_id, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2/Manutencao/Realizadas/Lugar/{lugar_id}"
@@ -28,23 +31,30 @@ def get_parciais(lugar_id, token):
         data = r.json().get("dataResult", {})
 
         backlog = data.get("qtdMotosInternas", 0)
-        internas_feitas = set()
+        # Usar dicionário para garantir unicidade por ID
+        internas_feitas = {}
         debug = []
+        
         for mecanico in data["manutencoesMecanico"]:
             if isinstance(mecanico["mecanicoId"], int) and mecanico["nome"] != "N/A":
-                #realizadas = mecanico.get("qtdInternas", 0)
-                #finalizadas =  min(historico,realizadas) 
                 finalizadas = get_historico_por_mecanico(mecanico["mecanicoId"],token)
                 debug.append({"nome": mecanico["nome"], "id":mecanico["mecanicoId"], "finalizadas": len(finalizadas)})
-                internas_feitas.update(finalizadas)
+                
+                # Adicionar cada item de finalizadas ao dicionário usando ID como chave
+                for manutencao in finalizadas:
+                    internas_feitas[manutencao["id"]] = manutencao
+        
+        # Converter o dicionário para lista
+        internas_feitas = list(internas_feitas.values())
 
         return {
+            "internas_feitas": internas_feitas,
             "qtdInternas": len(internas_feitas),
-            "backlog": backlog ,
+            "backlog": backlog,
         }
 
     except Exception as e:
-        return {"lugarId": lugar_id, "lugarNome": "Erro", "qtdInternas": 0, "backlog": 0, "erro": str(e)}
+        return {"internas_feitas": [],"qtdInternas": 0, "backlog": 0}
 
 def get_rampas(lugar_id, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2.6/Ativas/{lugar_id}/Ativas?Tipos=0&Tipos=1&Tipos=2&Tipos=3&Tipos=4&Tipos=5&Tipos=6&Tipos=7&Tipos=9&Tipos=10&Tipos=11&Tipos=12&Tipos=13&Tipos=14&Tipos=15&Situacoes=2&Pagina=1&QuantidadePorPagina=40"

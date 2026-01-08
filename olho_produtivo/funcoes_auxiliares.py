@@ -12,3 +12,14 @@ def safe_divide(numerator, denominator):
         return numerator / denominator
     except Exception as e:
         return 0
+
+def ordem_rampas(rampa):
+    # Prioridade 1: Box rápido (0)
+    # Prioridade 2: Cliente (1)
+    # Prioridade 3: Interna (2)
+    if rampa.get("box_rapido", False):
+        return 0
+    elif rampa.get("tipo_manutencao") == "Cliente":
+        return 1
+    else:
+        return 2

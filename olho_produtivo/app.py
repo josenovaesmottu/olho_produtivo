@@ -9,7 +9,7 @@ from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
-from funcoes_auxiliares import get_progress_color, safe_divide
+from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -31,6 +31,14 @@ if regional_sel == "GERAL":
     filiais_interesse = filiais["Bruno"] + filiais["Francisco"] + filiais["Flávio"]
 else:
     filiais_interesse = filiais[regional_sel]
+      
+      
+filiais_interesse = [{
+    "nome": "Mottu São Luís",
+    "id": "21",
+    "meta_interna": 23,
+    "meta_rampa": 13.0
+}]
 
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
@@ -38,7 +46,9 @@ for i, filial in enumerate(filiais_interesse):
     rampas = get_rampas(filial["id"], token) 
 
     filial["internas_realizadas"] = parcial["qtdInternas"]
+    filial["lista_internas_realizadas"] = parcial["internas_feitas"]
     filial["backlog"] = parcial["backlog"]
+    
     filial["rampas"] = rampas
     filial["rampas_ativas"] = len(rampas)
 
@@ -115,11 +125,22 @@ for _, row in df.iterrows():
         # Barra de progresso internas (vermelho → verde) com valores nas laterais
         cor = get_progress_color(prop_internas)
         pct = min(prop_internas * 100, 100)
+        
+        # Criar tooltip com informações das internas realizadas
+        lista_internas = row.get("lista_internas_realizadas", [])
+        if lista_internas:
+            placas = [item.get("placa", "N/A") for item in lista_internas]
+            tooltip_internas = "\n".join([f"Placa: {placa}" for placa in placas])
+            # Escapar aspas para não quebrar o HTML
+            tooltip_internas = tooltip_internas.replace('"', '&quot;')
+        else:
+            tooltip_internas = "Nenhuma interna realizada"
+        
         st.markdown(f"""
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-weight: bold; min-width: 25px;">{internas}</span>
             <div style="background-color: #ddd; border-radius: 5px; height: 20px; flex: 1;">
-                <div style="background-color: {cor}; width: {pct}%; height: 100%; border-radius: 5px;"></div>
+                <div style="background-color: {cor}; width: {pct}%; height: 100%; border-radius: 5px;" title="{tooltip_internas}"></div>
             </div>
             <span style="color: #666; min-width: 25px;">{meta_interna}</span>
         </div>
@@ -129,8 +150,7 @@ for _, row in df.iterrows():
         # Barra segmentada de rampas
         if meta_rampa > 0:
             segments_html = ""
-            # Ordenar rampas: box_rapido=True primeiro
-            rampas_list = sorted(row["rampas"], key=lambda x: 0 if x.get("box_rapido", False) else 1)
+            rampas_list = sorted(row["rampas"], key=ordem_rampas)
             total_slots = max(len(rampas_list), int(meta_rampa))
             
             # Iterar sobre cada slot de rampa
