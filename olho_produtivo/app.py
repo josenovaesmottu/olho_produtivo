@@ -17,7 +17,7 @@ st.title("⚙️ PAINEL DE PRODUÇÃO")
 
 filiais_path = Path(__file__).parent / "filiais.json"
 filiais = json.load(filiais_path.open("r", encoding="utf-8"))
-regionais = ["GERAL","Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
+regionais = ["-- GRANDES + JUMBO --","Francisco","Bruno","Flávio","Júlio","Leonardo","Luan","Lucas","Maurício","Rogério"]
 
 token = retorna_token()
 
@@ -27,11 +27,13 @@ st.caption("O dashboard atualiza automaticamente a cada 15min ou manualmente.")
 if st.button("🔄 Atualizar agora"):
     st.rerun()
 
-if regional_sel == "GERAL":
-    filiais_interesse = filiais["Bruno"] + filiais["Francisco"] + filiais["Flávio"]
+if regional_sel == "-- GRANDES + JUMBO --":
+    filiais_interesse = filiais["Bruno"] + filiais["Francisco"] + filiais["Júlio"]
 else:
     filiais_interesse = filiais[regional_sel]
-      
+
+filiais_interesse =[{"nome": "Mottu Recife", "id": "16", "meta_interna": 15, "meta_rampa": 9.0}]
+
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
     parcial = get_parciais(filial["id"], token)
@@ -92,13 +94,13 @@ col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
 # Exibir cada filial
 for _, row in df.iterrows():
     nome = row["nome"]
-    backlog = row["backlog"] or 0
+    backlog = int(row["backlog"]) or 0
     internas = row["internas_realizadas"] or 0
-    meta_interna = row["meta_interna"] or 1
-    rampas_ativas = row["rampas_ativas"] or 0
+    meta_interna = int(row["meta_interna"]) or 1
+    rampas_ativas = int(row["rampas_ativas"]) or 0
     #rampas_clientes = row["rampas_clientes"] or 0
     #rampas_internas = row["rampas_internas"] or 0
-    meta_rampa = row["meta_rampa"] or 0
+    meta_rampa = int(row["meta_rampa"]) or 0
     
     # Calcular proporções
     prop_internas = row["progresso_internas"]
