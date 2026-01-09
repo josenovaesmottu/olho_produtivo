@@ -2,7 +2,7 @@ def get_progress_color(ratio):
     """Retorna cor: vermelho (<40%), amarelo (40-80%), verde (>80%)"""
     if ratio < 0.5:
         return "#dc3545"  # Vermelho
-    elif ratio <= 1:
+    elif ratio >= 1:
         return  "#28a745"  # Verde
     else:
         return "#ffc107"  # Amarelo
