@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
-from datetime import date
-
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 def get_historico_por_mecanico(mecanicoId, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2.6/Manutencao/HistoricoPorMecanico?mecanicoId={mecanicoId}&pagina=1&quantidadePorPagina=30"
@@ -11,8 +11,9 @@ def get_historico_por_mecanico(mecanicoId, token):
         r.raise_for_status()
         manutencoes = r.json()["dataResult"]["manutencoes"]
         finalizadas = []
+                
         for manutencao in manutencoes:
-            if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(date.today()):
+            if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(datetime.now(ZoneInfo("America/Sao_Paulo")).date()):
                 finalizadas.append({
                     "id": manutencao["id"],
                     "placa": manutencao["placa"]
