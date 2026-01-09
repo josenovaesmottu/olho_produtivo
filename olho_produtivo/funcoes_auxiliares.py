@@ -1,11 +1,11 @@
 def get_progress_color(ratio):
     """Retorna cor: vermelho (<40%), amarelo (40-80%), verde (>80%)"""
-    if ratio < 0.4:
+    if ratio < 0.5:
         return "#dc3545"  # Vermelho
-    elif ratio < 0.8:
-        return "#ffc107"  # Amarelo
+    elif ratio <= 1:
+        return  "#28a745"  # Verde
     else:
-        return "#28a745"  # Verde
+        return "#ffc107"  # Amarelo
 
 def safe_divide(numerator, denominator):
     try:
