@@ -9,7 +9,7 @@ from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
-from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int, format_time_delta
+from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -64,16 +64,14 @@ else:
 
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
-    parcial = get_parciais(filial["id"], filial["mecs"], token)
+    parcial = get_parciais(filial["id"], token)
     rampas = get_rampas(filial["id"], token) 
 
     filial["internas_realizadas"] = parcial["qtdInternas"]
     filial["lista_internas_realizadas"] = parcial["internas_feitas"]
     filial["backlog"] = parcial["backlog"]
-    filial["mecs"] = parcial["mecs"]
     
     filial["rampas"] = rampas
-    #filial["dados_mecanicos"] = compila_dados_mecanicos(filial["mecanicos"])
     filial["rampas_ativas"] = len(rampas)
 
     filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], filial["meta_interna"])
@@ -216,62 +214,5 @@ for _, row in df.iterrows():
             """, unsafe_allow_html=True)
         else:
             st.write("—")
-    
-    with col_mecanicos:
-        # Exibir mecânicos de forma simples
-        mecs = row.get("mecs", {})
-        if mecs:
-            # Criar uma string simples com contagem de mecânicos por status
-            em_manutencao_count = 0
-            sem_manutencao_count = 0
-            inativos_count = 0
-            
-            for mec_id, mec_data in mecs.items():
-                ultima_atividade = mec_data.get("ultima_atividade")
-                em_manutencao = mec_data.get("emManutencao", False)
-                delta_texto = format_time_delta(ultima_atividade)
-                
-                if ultima_atividade is None or delta_texto == "sem atividade":
-                    inativos_count += 1
-                elif em_manutencao:
-                    em_manutencao_count += 1
-                else:
-                    sem_manutencao_count += 1
-            
-            # Exibir resumo com ícones coloridos
-            st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
-                      f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
-                      f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
-                      unsafe_allow_html=True)
-            
-            # Usar expander para detalhes
-            with st.expander(f"Ver detalhes dos {len(mecs)} mecânicos"): 
-                # Criar tabela para exibir os mecânicos
-                mecanicos_data = []
-                
-                for mec_id, mec_data in mecs.items():
-                    nome_mec = mec_data.get("nome", "Desconhecido")
-                    ultima_atividade = mec_data.get("ultima_atividade")
-                    em_manutencao = mec_data.get("emManutencao", False)
-                    delta_texto = format_time_delta(ultima_atividade)
-                    
-                    if ultima_atividade is None or delta_texto == "sem atividade":
-                        status = "Inativo"
-                    elif em_manutencao:
-                        status = "Em manutenção"
-                    else:
-                        status = "Sem manutenção"
-                    
-                    mecanicos_data.append({
-                        "Nome": nome_mec,
-                        "Status": status,
-                        "Tempo": delta_texto
-                    })
-                
-                # Criar e exibir DataFrame
-                df_mecanicos = pd.DataFrame(mecanicos_data)
-                st.dataframe(df_mecanicos, hide_index=True)
-        else:
-            st.write("Sem mecânicos")
 
 st.divider()
