@@ -1,2 +1,4 @@
 olho_produtivo/processa_metas.py
 olho_produtivo/get_token.py
+olho_produtivo/query_raw_filiais.py
+olho_produtivo/filais.json
