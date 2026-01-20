@@ -41,9 +41,10 @@ def get_parciais(lugar_id, mecs, token):
         internas_feitas = {}
         debug = []
         
-        for mec in mecs:
-            mecs[mec]["ultima_atividade"] = None
-            mecs[mec]["emManutencao"] = False
+        # Inicializar valores para cada mecânico
+        for mec_id in mecs:
+            mecs[mec_id]["ultima_atividade"] = None
+            mecs[mec_id]["emManutencao"] = False
 
         for mecanico in data["manutencoesMecanico"]:
             if isinstance(mecanico["mecanicoId"], int) and mecanico["nome"] != "N/A":

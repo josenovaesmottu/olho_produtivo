@@ -13,6 +13,36 @@ from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, sa
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
+
+# Estilos CSS globais
+st.markdown("""
+<style>
+.mecanicos-container {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    gap: 8px;
+    white-space: nowrap;
+}
+.mecanico-card {
+    min-width: 100px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px;
+    text-align: center;
+    margin-right: 4px;
+    display: inline-block;
+}
+.mecanico-nome {
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("⚙️ PAINEL DE PRODUÇÃO")
 
 filiais_path = Path(__file__).parent / "filiais.json"
@@ -188,69 +218,59 @@ for _, row in df.iterrows():
             st.write("—")
     
     with col_mecanicos:
-        # Exibir mecânicos em linha horizontal com rolagem
+        # Exibir mecânicos de forma simples
         mecs = row.get("mecs", {})
         if mecs:
-            # CSS para criar container com rolagem horizontal
-            st.markdown("""
-            <style>
-            .mecanicos-container {
-                display: flex;
-                overflow-x: auto;
-                padding-bottom: 10px;
-                gap: 8px;
-            }
-            .mecanico-card {
-                min-width: 100px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                padding: 8px;
-                text-align: center;
-                margin-right: 4px;
-            }
-            .mecanico-nome {
-                font-weight: bold;
-                font-size: 14px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            # Criar uma string simples com contagem de mecânicos por status
+            em_manutencao_count = 0
+            sem_manutencao_count = 0
+            inativos_count = 0
             
-            # Iniciar container de mecânicos
-            mecanicos_html = "<div class='mecanicos-container'>"
-            
-            # Adicionar cada mecânico ao container
             for mec_id, mec_data in mecs.items():
-                nome_mec = mec_data.get("nome", "Desconhecido")
                 ultima_atividade = mec_data.get("ultima_atividade")
                 em_manutencao = mec_data.get("emManutencao", False)
-                
-                # Formatar delta de tempo
                 delta_texto = format_time_delta(ultima_atividade)
                 
-                # Determinar cor com base no status
                 if ultima_atividade is None or delta_texto == "sem atividade":
-                    cor_status = "#777777"  # Cinza para sem atividade
+                    inativos_count += 1
                 elif em_manutencao:
-                    cor_status = "#28a745"  # Verde para em manutenção
+                    em_manutencao_count += 1
                 else:
-                    cor_status = "#9c27b0"  # Roxo para sem manutenção
+                    sem_manutencao_count += 1
+            
+            # Exibir resumo com ícones coloridos
+            st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
+                      f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
+                      f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
+                      unsafe_allow_html=True)
+            
+            # Usar expander para detalhes
+            with st.expander(f"Ver detalhes dos {len(mecs)} mecânicos"): 
+                # Criar tabela para exibir os mecânicos
+                mecanicos_data = []
                 
-                # Adicionar card do mecânico
-                mecanicos_html += f"""
-                <div class='mecanico-card'>
-                    <div class='mecanico-nome'>{nome_mec}</div>
-                    <div style='color: {cor_status}; font-size: 12px;'>{delta_texto}</div>
-                </div>
-                """
-            
-            # Fechar container
-            mecanicos_html += "</div>"
-            
-            # Exibir container de mecânicos
-            st.markdown(mecanicos_html, unsafe_allow_html=True)
+                for mec_id, mec_data in mecs.items():
+                    nome_mec = mec_data.get("nome", "Desconhecido")
+                    ultima_atividade = mec_data.get("ultima_atividade")
+                    em_manutencao = mec_data.get("emManutencao", False)
+                    delta_texto = format_time_delta(ultima_atividade)
+                    
+                    if ultima_atividade is None or delta_texto == "sem atividade":
+                        status = "Inativo"
+                    elif em_manutencao:
+                        status = "Em manutenção"
+                    else:
+                        status = "Sem manutenção"
+                    
+                    mecanicos_data.append({
+                        "Nome": nome_mec,
+                        "Status": status,
+                        "Tempo": delta_texto
+                    })
+                
+                # Criar e exibir DataFrame
+                df_mecanicos = pd.DataFrame(mecanicos_data)
+                st.dataframe(df_mecanicos, hide_index=True)
         else:
             st.write("Sem mecânicos")
 
