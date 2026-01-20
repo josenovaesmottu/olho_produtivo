@@ -11,19 +11,24 @@ def get_historico_por_mecanico(mecanicoId, token):
         r.raise_for_status()
         manutencoes = r.json()["dataResult"]["manutencoes"]
         finalizadas = []
-                
+        ultimaAtividade = "2024-01-01T12:00:00.00000"
+        emManutencao = False
+        if manutencoes[0]["situacao"] == 2:
+            emManutencao = True
         for manutencao in manutencoes:
+            if manutencao["atualizacaoData"] > ultimaAtividade:
+                ultimaAtividade = manutencao["atualizacaoData"]
             if manutencao["situacao"] == 4 and manutencao["tipo"] in [3,4,6,9,15] and manutencao["atualizacaoData"][:10] == str(datetime.now(ZoneInfo("America/Sao_Paulo")).date()):
                 finalizadas.append({
                     "id": manutencao["id"],
                     "placa": manutencao["placa"]
                 })
-        return finalizadas
+        return finalizadas, ultimaAtividade, emManutencao
 
     except Exception as e:
-        return [{"id": 0, "placa": "Erro"}]
+        return [{"id": 0, "placa": "Erro"}], "Erro"
 
-def get_parciais(lugar_id, token):
+def get_parciais(lugar_id, mecs, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2/Manutencao/Realizadas/Lugar/{lugar_id}"
     headers = {"Authorization": f"Bearer {token}", "accept": "application/json"}
     try:
@@ -36,10 +41,18 @@ def get_parciais(lugar_id, token):
         internas_feitas = {}
         debug = []
         
+        for mec in mecs:
+            mecs[mec]["ultima_atividade"] = None
+            mecs[mec]["emManutencao"] = False
+
         for mecanico in data["manutencoesMecanico"]:
             if isinstance(mecanico["mecanicoId"], int) and mecanico["nome"] != "N/A":
-                finalizadas = get_historico_por_mecanico(mecanico["mecanicoId"],token)
-                debug.append({"nome": mecanico["nome"], "id":mecanico["mecanicoId"], "finalizadas": len(finalizadas)})
+                finalizadas, ultima_atividade, emManutencao = get_historico_por_mecanico(mecanico["mecanicoId"], token)                
+                id = str(mecanico["mecanicoId"])
+                mecs[id]["ultima_atividade"] = ultima_atividade
+                mecs[id]["emManutencao"] = emManutencao
+
+                debug.append({"nome": mecanico["nome"], "id": mecanico["mecanicoId"], "finalizadas": len(finalizadas), "emManutencao": emManutencao})
                 
                 # Adicionar cada item de finalizadas ao dicionário usando ID como chave
                 for manutencao in finalizadas:
@@ -52,10 +65,11 @@ def get_parciais(lugar_id, token):
             "internas_feitas": internas_feitas,
             "qtdInternas": len(internas_feitas),
             "backlog": backlog,
+            "mecs": mecs
         }
 
     except Exception as e:
-        return {"internas_feitas": [],"qtdInternas": 0, "backlog": 0}
+        return {"internas_feitas": [],"qtdInternas": 0, "backlog": 0,"mecs": mecs}
 
 def get_rampas(lugar_id, token):
     url = f"https://maintenance-backend.mottu.cloud/api/v2.6/Ativas/{lugar_id}/Ativas?Tipos=0&Tipos=1&Tipos=2&Tipos=3&Tipos=4&Tipos=5&Tipos=6&Tipos=7&Tipos=9&Tipos=10&Tipos=11&Tipos=12&Tipos=13&Tipos=14&Tipos=15&Situacoes=2&Pagina=1&QuantidadePorPagina=40"

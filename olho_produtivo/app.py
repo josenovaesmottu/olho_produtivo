@@ -9,7 +9,8 @@ from pathlib import Path
 from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
-from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int
+from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int, format_time_delta
+from rhid import compila_dados_mecanicos
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -34,14 +35,16 @@ else:
 
 progress = st.progress(0)
 for i, filial in enumerate(filiais_interesse):
-    parcial = get_parciais(filial["id"], token)
+    parcial = get_parciais(filial["id"], filial["mecs"], token)
     rampas = get_rampas(filial["id"], token) 
 
     filial["internas_realizadas"] = parcial["qtdInternas"]
     filial["lista_internas_realizadas"] = parcial["internas_feitas"]
     filial["backlog"] = parcial["backlog"]
+    filial["mecs"] = parcial["mecs"]
     
     filial["rampas"] = rampas
+    #filial["dados_mecanicos"] = compila_dados_mecanicos(filial["mecanicos"])
     filial["rampas_ativas"] = len(rampas)
 
     filial["progresso_internas"] = safe_divide(filial["internas_realizadas"], filial["meta_interna"])
@@ -185,3 +188,66 @@ for _, row in df.iterrows():
             st.write("—")
 
 st.divider()
+
+# ==============================
+# PAINEL DE MECÂNICOS
+# ==============================
+st.subheader("👨‍🔧 Mecânicos")
+
+# Exibir mecânicos de cada filial
+for _, row in df.iterrows():
+    nome_filial = row["nome"]
+    mecs = row.get("mecs", {})
+    
+    if not mecs:
+        continue
+        
+    st.write(f"**{nome_filial}**")
+    
+    # Determinar número de colunas (máximo 6 mecânicos por linha)
+    num_mecs = len(mecs)
+    cols_per_row = min(6, max(1, num_mecs))
+    
+    # Criar grid de mecânicos
+    i = 0
+    while i < num_mecs:
+        # Criar colunas para esta linha
+        cols = st.columns(cols_per_row)
+        
+        # Preencher as colunas com mecânicos
+        for j in range(cols_per_row):
+            if i < num_mecs:
+                # Obter ID e dados do mecânico
+                mec_id = list(mecs.keys())[i]
+                mec_data = mecs[mec_id]
+                
+                # Obter nome e status
+                nome_mec = mec_data.get("nome", "Desconhecido")
+                ultima_atividade = mec_data.get("ultima_atividade")
+                em_manutencao = mec_data.get("emManutencao", False)
+                
+                # Formatar delta de tempo
+                delta_texto = format_time_delta(ultima_atividade)
+                
+                # Determinar cor com base no status
+                if ultima_atividade is None or delta_texto == "sem atividade":
+                    cor_status = "#777777"  # Cinza para sem atividade
+                elif em_manutencao:
+                    cor_status = "#28a745"  # Verde para em manutenção
+                else:
+                    cor_status = "#9c27b0"  # Roxo para sem manutenção
+                
+                # Exibir mecânico na coluna
+                with cols[j]:
+                    st.markdown(f"""
+                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 8px; text-align: center; margin-bottom: 10px;">
+                        <div style="font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{nome_mec}</div>
+                        <div style="color: {cor_status}; font-size: 12px;">{delta_texto}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                i += 1
+            else:
+                # Coluna vazia para completar a linha
+                with cols[j]:
+                    st.write("")
