@@ -83,12 +83,11 @@ col3.metric("Rampas ativas", int(df["rampas_ativas"].sum()))
 st.divider()
 
 # Headers
-col_nome, col_backlog, col_internas, col_rampas, col_mecanicos = st.columns([2, 1, 2, 2, 4])
+col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
 col_nome.markdown("**Filial**")
 col_backlog.markdown("**Backlog**")
 col_internas.markdown("**Internas**")
 col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
-col_mecanicos.markdown("**Mecânicos (Verde = Em manutenção, Roxo = Sem manutenção)**")
 
 # Exibir cada filial
 for _, row in df.iterrows():
