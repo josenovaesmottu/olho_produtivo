@@ -85,11 +85,12 @@ col3.metric("Rampas ativas", int(df["rampas_ativas"].sum()))
 st.divider()
 
 # Headers
-col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
+col_nome, col_backlog, col_internas, col_rampas, col_mecanicos = st.columns([2, 1, 2, 2, 4])
 col_nome.markdown("**Filial**")
 col_backlog.markdown("**Backlog**")
 col_internas.markdown("**Internas**")
 col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
+col_mecanicos.markdown("**Mecânicos (Verde = Em manutenção, Roxo = Sem manutenção)**")
 
 # Exibir cada filial
 for _, row in df.iterrows():
@@ -106,8 +107,8 @@ for _, row in df.iterrows():
     prop_internas = row["progresso_internas"]
     prop_rampas = row["ocupacao_rampas"]
     
-    # Layout: Nome | Backlog | Barra Internas | Barra Rampas
-    col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
+    # Layout: Nome | Backlog | Barra Internas | Barra Rampas | Mecânicos
+    col_nome, col_backlog, col_internas, col_rampas, col_mecanicos = st.columns([2, 1, 2, 2, 4])
         
     with col_nome:
         st.write(f"{nome}")
@@ -185,39 +186,43 @@ for _, row in df.iterrows():
             """, unsafe_allow_html=True)
         else:
             st.write("—")
-
-st.divider()
-
-# ==============================
-# PAINEL DE MECÂNICOS
-# ==============================
-st.subheader("👨‍🔧 Mecânicos")
-
-# Exibir mecânicos de cada filial
-for _, row in df.iterrows():
-    nome_filial = row["nome"]
-    mecs = row.get("mecs", {})
+    
+    with col_mecanicos:
+        # Exibir mecânicos em linha horizontal com rolagem
+        mecs = row.get("mecs", {})
+        if mecs:
+            # CSS para criar container com rolagem horizontal
+            st.markdown("""
+            <style>
+            .mecanicos-container {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                gap: 8px;
+            }
+            .mecanico-card {
+                min-width: 100px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 8px;
+                text-align: center;
+                margin-right: 4px;
+            }
+            .mecanico-nome {
+                font-weight: bold;
+                font-size: 14px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            </style>
+            """, unsafe_allow_html=True)
             
-    st.write(f"**{nome_filial}**")
-    
-    # Determinar número de colunas (máximo 6 mecânicos por linha)
-    num_mecs = len(mecs)
-    cols_per_row = min(6, max(1, num_mecs))
-    
-    # Criar grid de mecânicos
-    i = 0
-    while i < num_mecs:
-        # Criar colunas para esta linha
-        cols = st.columns(cols_per_row)
-        
-        # Preencher as colunas com mecânicos
-        for j in range(cols_per_row):
-            if i < num_mecs:
-                # Obter ID e dados do mecânico
-                mec_id = list(mecs.keys())[i]
-                mec_data = mecs[mec_id]
-                
-                # Obter nome e status
+            # Iniciar container de mecânicos
+            mecanicos_html = "<div class='mecanicos-container'>"
+            
+            # Adicionar cada mecânico ao container
+            for mec_id, mec_data in mecs.items():
                 nome_mec = mec_data.get("nome", "Desconhecido")
                 ultima_atividade = mec_data.get("ultima_atividade")
                 em_manutencao = mec_data.get("emManutencao", False)
@@ -233,17 +238,20 @@ for _, row in df.iterrows():
                 else:
                     cor_status = "#9c27b0"  # Roxo para sem manutenção
                 
-                # Exibir mecânico na coluna
-                with cols[j]:
-                    st.markdown(f"""
-                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 8px; text-align: center; margin-bottom: 10px;">
-                        <div style="font-weight: bold; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{nome_mec}</div>
-                        <div style="color: {cor_status}; font-size: 12px;">{delta_texto}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                i += 1
-            else:
-                # Coluna vazia para completar a linha
-                with cols[j]:
-                    st.write("")
+                # Adicionar card do mecânico
+                mecanicos_html += f"""
+                <div class='mecanico-card'>
+                    <div class='mecanico-nome'>{nome_mec}</div>
+                    <div style='color: {cor_status}; font-size: 12px;'>{delta_texto}</div>
+                </div>
+                """
+            
+            # Fechar container
+            mecanicos_html += "</div>"
+            
+            # Exibir container de mecânicos
+            st.markdown(mecanicos_html, unsafe_allow_html=True)
+        else:
+            st.write("Sem mecânicos")
+
+st.divider()
