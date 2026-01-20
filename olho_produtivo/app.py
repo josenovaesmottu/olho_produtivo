@@ -10,7 +10,6 @@ from streamlit_autorefresh import st_autorefresh
 from get_token import retorna_token
 from get_manutencoes import get_parciais, get_rampas
 from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, safe_int, format_time_delta
-from rhid import compila_dados_mecanicos
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
@@ -198,10 +197,7 @@ st.subheader("👨‍🔧 Mecânicos")
 for _, row in df.iterrows():
     nome_filial = row["nome"]
     mecs = row.get("mecs", {})
-    
-    if not mecs:
-        continue
-        
+            
     st.write(f"**{nome_filial}**")
     
     # Determinar número de colunas (máximo 6 mecânicos por linha)
