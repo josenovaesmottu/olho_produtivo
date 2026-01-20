@@ -105,7 +105,7 @@ for _, row in df.iterrows():
     prop_rampas = row["ocupacao_rampas"]
     
     # Layout: Nome | Backlog | Barra Internas | Barra Rampas | Mecânicos
-    col_nome, col_backlog, col_internas, col_rampas, col_mecanicos = st.columns([2, 1, 2, 2, 4])
+    col_nome, col_backlog, col_internas, col_rampas = st.columns([2, 1, 2, 2])
         
     with col_nome:
         st.write(f"{nome}")
