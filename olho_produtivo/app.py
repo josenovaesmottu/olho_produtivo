@@ -118,7 +118,7 @@ col_nome.markdown("**Filial**")
 col_backlog.markdown("**Backlog**")
 col_internas.markdown("**Internas**")
 col_rampas.markdown("**Rampas Ativas (Azul = Cliente, Verde = Interna)**")
-col_mecanicos.markdown("**EM TESTES - Mecânicos (Verde = Em manutenção, Roxo = Sem manutenção)**")
+col_mecanicos.markdown("**Mecânicos (Verde = Em manutenção, Roxo = Sem manutenção)**")
 
 # Exibir cada filial
 for _, row in df.iterrows():
