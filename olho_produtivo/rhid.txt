@@ -1,0 +1,5 @@
+as 9 da manha:
+1) pegar os nomes dos mecanicos daquela filial (necessario: incluir na query) [fulano1,fulano2,fulano3,etc]
+2) bater no endpoint de autenticação rhid, retornar token do rhid
+3) bater no endpoint de peoplerhid, retornar lista de nome/id do rhid, fazer o mapping com a lista de filiais [{nome:fulano1,id:123456789},{nome:fulano2,id:123456},etc]
+3) de hora em hora, bater no endpoint de apuracao do ponto [{nome:fulano1,id:123456789,rhid:123456789,presente:true,ultima_atividade:"data_hora"},{nome:fulano2,id:123456,rhid:123456,presente:false,ultima_atividade:"2025-01-01T00:00:00"},etc]
