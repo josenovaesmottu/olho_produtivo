@@ -13,36 +13,6 @@ from funcoes_auxiliares import get_progress_color, safe_divide, ordem_rampas, sa
 
 st_autorefresh(interval= 15 * 60 * 1000, key="dataframerefresh")
 st.set_page_config(page_title="Produtividade Manutenções", page_icon="⚙️", layout="wide")
-
-# Estilos CSS globais
-st.markdown("""
-<style>
-.mecanicos-container {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    gap: 8px;
-    white-space: nowrap;
-}
-.mecanico-card {
-    min-width: 100px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 8px;
-    text-align: center;
-    margin-right: 4px;
-    display: inline-block;
-}
-.mecanico-nome {
-    font-weight: bold;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-</style>
-""", unsafe_allow_html=True)
-
 st.title("⚙️ PAINEL DE PRODUÇÃO")
 
 filiais_path = Path(__file__).parent / "filiais.json"
