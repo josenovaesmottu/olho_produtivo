@@ -238,25 +238,14 @@ for _, row in df.iterrows():
                 else:
                     sem_manutencao_count += 1
             
-            # Inicializar o estado da sessão para esta filial se não existir
-            btn_key = f"mostrar_detalhes_{nome}"
-            if btn_key not in st.session_state:
-                st.session_state[btn_key] = False
-                
-            # Exibir resumo com ícones coloridos e link para detalhes na mesma linha
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
-                          f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
-                          f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
-                          unsafe_allow_html=True)
+            # Exibir resumo com ícones coloridos
+            st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
+                      f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
+                      f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
+                      unsafe_allow_html=True)
             
-            # Botão para alternar a exibição dos detalhes
-            if col2.button("Ver detalhes" if not st.session_state[btn_key] else "Ocultar detalhes", key=f"btn_mec_{nome}"):
-                st.session_state[btn_key] = not st.session_state[btn_key]
-            
-            # Mostrar detalhes apenas se o estado for True
-            if st.session_state[btn_key]: 
+            # Usar expander para mostrar detalhes (funciona como dropdown)
+            with st.expander(f"Ver detalhes dos {len(mecs)} mecânicos"): 
                 # Criar tabela para exibir os mecânicos
                 mecanicos_data = []
                 
