@@ -238,39 +238,45 @@ for _, row in df.iterrows():
                 else:
                     sem_manutencao_count += 1
             
-            # Exibir resumo com ícones coloridos
-            st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
-                      f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
-                      f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
-                      unsafe_allow_html=True)
+            # Criar layout com duas colunas para colocar o dropdown à direita
+            col1, col2 = st.columns([3, 1])
             
-            # Usar expander para mostrar detalhes (funciona como dropdown)
-            with st.expander(f"Ver detalhes dos {len(mecs)} mecânicos"): 
-                # Criar tabela para exibir os mecânicos
-                mecanicos_data = []
-                
-                for mec_id, mec_data in mecs.items():
-                    nome_mec = mec_data.get("nome", "Desconhecido")
-                    ultima_atividade = mec_data.get("ultima_atividade")
-                    em_manutencao = mec_data.get("emManutencao", False)
-                    delta_texto = format_time_delta(ultima_atividade)
+            # Exibir resumo com ícones coloridos na coluna da esquerda
+            with col1:
+                st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
+                          f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
+                          f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
+                          unsafe_allow_html=True)
+            
+            # Usar expander na coluna da direita
+            with col2:
+                with st.expander(f"Ver detalhes ({len(mecs)})"): 
+                    # Criar tabela para exibir os mecânicos
+                    mecanicos_data = []
                     
-                    if ultima_atividade is None or delta_texto == "sem atividade":
-                        status = "Inativo"
-                    elif em_manutencao:
-                        status = "Em manutenção"
-                    else:
-                        status = "Sem manutenção"
+                    # Adicionar cada mecânico à lista
+                    for mec_id, mec_data in mecs.items():
+                        nome_mec = mec_data.get("nome", "Desconhecido")
+                        ultima_atividade = mec_data.get("ultima_atividade")
+                        em_manutencao = mec_data.get("emManutencao", False)
+                        delta_texto = format_time_delta(ultima_atividade)
+                        
+                        if ultima_atividade is None or delta_texto == "sem atividade":
+                            status = "Inativo"
+                        elif em_manutencao:
+                            status = "Em manutenção"
+                        else:
+                            status = "Sem manutenção"
+                        
+                        mecanicos_data.append({
+                            "Nome": nome_mec,
+                            "Status": status,
+                            "Tempo": delta_texto
+                        })
                     
-                    mecanicos_data.append({
-                        "Nome": nome_mec,
-                        "Status": status,
-                        "Tempo": delta_texto
-                    })
-                
-                # Criar e exibir DataFrame
-                df_mecanicos = pd.DataFrame(mecanicos_data)
-                st.dataframe(df_mecanicos, hide_index=True)
+                    # Criar e exibir DataFrame
+                    df_mecanicos = pd.DataFrame(mecanicos_data)
+                    st.dataframe(df_mecanicos, hide_index=True)
         else:
             st.write("Sem mecânicos")
 
