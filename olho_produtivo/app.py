@@ -238,14 +238,19 @@ for _, row in df.iterrows():
                 else:
                     sem_manutencao_count += 1
             
-            # Exibir resumo com ícones coloridos
-            st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
-                      f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
-                      f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
-                      unsafe_allow_html=True)
+            # Exibir resumo com ícones coloridos e link para detalhes na mesma linha
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"<span style='color:green'>🟢 Em manutenção: {em_manutencao_count}</span> | "
+                          f"<span style='color:purple'>🟣 Sem manutenção: {sem_manutencao_count}</span> | "
+                          f"<span style='color:gray'>⚫ Inativos: {inativos_count}</span>", 
+                          unsafe_allow_html=True)
             
-            # Usar expander para detalhes
-            with st.expander(f"Ver detalhes dos {len(mecs)} mecânicos"): 
+            # Botão para mostrar detalhes na mesma linha
+            mostrar_detalhes = col2.button(f"Ver detalhes ({len(mecs)})", key=f"btn_mec_{nome}")
+            
+            # Mostrar detalhes apenas se o botão for clicado
+            if mostrar_detalhes: 
                 # Criar tabela para exibir os mecânicos
                 mecanicos_data = []
                 
