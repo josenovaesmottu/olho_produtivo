@@ -26,7 +26,7 @@ select
   ,ma.mecs
 from `exp_atendimentos.cadastro_filiais` cf
 left join `exp_frota.mecanicos_rampa_ideal` mri on mri.filial = cf.lugar
-left join (select filial, count(*) as meta_internas from `exp_frota.ordem_de_producao` group by all) op on op.filial = cf.lugar
+left join (select filial, count(*) as meta_internas from `exp_frota.ordem_de_producao_historico` where dia_ordem = current_date()-1 group by all) op on op.filial = cf.lugar
 left join mecs_agrupados ma on cf.lugar = ma.filial 
 where 
   cf.terceiro = 0 
