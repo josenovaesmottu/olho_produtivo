@@ -26,7 +26,7 @@ def get_historico_por_mecanico(mecanicoId, token):
         finalizadas_cliente = []
         ultimaAtividade = "2025-01-01T00:00:00"
         emManutencao = False
-        if manutencoes[0]["situacao"] == 2:
+        if manutencoes and manutencoes[0]["situacao"] == 2:
             emManutencao = True
              
         for manutencao in manutencoes:
